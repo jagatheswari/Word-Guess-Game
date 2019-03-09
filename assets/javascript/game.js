@@ -1,5 +1,5 @@
 // Create array of words
-const sportsList = ['tennis','soccer','football','hockey','handball','cricket','baseball','basketball','volleyball','badminton']
+const sportsList = ['tennis','soccer','football','hockey','handball','cricket','baseball','basketball','volleyball','badminton'];
 // TO count number of wins
 let wins = 0;
 // Maximum guesses for each word
@@ -8,19 +8,33 @@ const maxGuess = 20;
 let guessCount = 0;
 // Letters Matched
 let letterMatch = 0;
-// Choose words randomly
-let sportIndex = Math.floor(Math.random() * sportsList.length);
-let choosenWord = sportsList[sportIndex];
-console.log(choosenWord);
+// Underscores array
 var underScore = [];
+let choosenWord;
+let isFinished = false;
+
 // Create underscores based on length of the word
-let printUnderscore = () => {
-    for(let i=0 ;i<choosenWord.length;i++){
-        underScore.push('_');
+const printUnderscore = () => {
+    if(choosenWord != undefined) {
+        for(let i=0 ;i<choosenWord.length;i++){
+            underScore.push('_');
+        }
+    // return underScore; 
     }
-    return underScore; 
 }
-console.log(printUnderscore());
+
+const init = _ => {
+    // Choose words randomly
+    let sportIndex = Math.floor(Math.random() * sportsList.length);
+    isFinished = false;
+    choosenWord = sportsList[sportIndex];
+    underScore = [];
+    guessCount = 0;
+    letterMatch = 0;
+    console.log(choosenWord);
+    printUnderscore();
+    updatePage();
+}
 // Get users guess
 document.addEventListener('keypress',(event) => {
     let currentKey = event.keyCode;
@@ -35,7 +49,7 @@ document.addEventListener('keypress',(event) => {
     {
         // If right,flip corresponding underscore
         if(underScore[index] === '_') {
-            underScore.fill(currentKey,index, index+1);
+            underScore.fill(currentLetter,index, index+1);
             letterMatch++;    
         }
         //underScore[index] = currentKey;
@@ -44,7 +58,7 @@ document.addEventListener('keypress',(event) => {
         for(let loop =index+1;loop<choosenWord.length;loop++){
             if(choosenWord.charAt(loop)===currentLetter){
                 if(underScore[loop] === '_') {
-                    underScore.fill(currentKey,loop,loop+1);
+                    underScore.fill(currentLetter,loop,loop+1);
                     letterMatch++;    
                 }
             }
@@ -53,14 +67,41 @@ document.addEventListener('keypress',(event) => {
          console.log(letterMatch);
          if(letterMatch===choosenWord.length){
              wins++;
+             isFinished = true;
              //now restart/reset/init agian for finding next word
          }
          else if(guessCount === maxGuess) {
              //Oops you have reached max number of guess
              // try again
-             // now restart/reset/init again for finding next word
+             // now restart/reset/init again for finding next word5
+             isFinished = true;
          }
          console.log(wins);
+         updatePage();
+
     }
 })
+
+function updatePage() {
+    document.querySelector('#Wins').textContent = `Wins:${wins}`;
+    document.querySelector('#MaskedWord').textContent = `${underScore.toString()}`;
+    document.querySelector('#RemainingGuesses').textContent = `${maxGuess - guessCount}`;
+    document.querySelector('#LettersGuessed').textContent = `${letterMatch}`;
+    if(isFinished) {
+        // Set the correct image.
+        document.getElementById("gamePicture").src = `./assets/images/${choosenWord}.png`;
+    }
+    else {
+        // Set the question mark image.
+        document.getElementById("gamePicture").src = "./assets/images/questionmark.png";
+    }
+}
+
+function resetPage() {
+    if(isFinished) {
+        init();
+    }
+}
+
+init()
 // If wrong,[]
